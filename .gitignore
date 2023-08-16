@@ -1,0 +1,8 @@
+/target/
+/.project
+/.settings
+/.classpat
+*.log
+/.settings/*
+/tool.status
+/.classpath

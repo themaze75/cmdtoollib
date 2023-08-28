@@ -56,7 +56,7 @@ You'll need to create your main app class.
 
 	<dependencies>
 		<dependency>
-			<groupId>com.maziade</groupId>
+			<groupId>com.maziade.tools</groupId>
 			<artifactId>cmdtoollib</artifactId>
 			<version>0.0.1</version>
 		</dependency>
@@ -145,7 +145,7 @@ Add a component scan annotation to your main app to add the parts of this librar
 @ComponentScan({"com.maziade.cmdtool.utils","com.maziade.cmdtool.commands"})
 ``` 
 
-## Your Commands
+## Adding Your Commands
 
 You'll need to brush up on Spring Shell, but for a quick hello-world:
 
@@ -228,8 +228,13 @@ Here's a setup that might help you get started.
 </configuration>
 ```
 
+## Run from command line
+
+From the pom template, you'll build an executable jar.
+
+From maven, you can easily start with `mvn spring-boot:run`
+
+
 ## TODO
 
-- can we make this a thing we can use as parent for quicker startupping?
-- cleanup pom (mainclass)
-- how to setup runnable on our project?
+- can we make this a lib so we can use it as a parent pom project insead of spring boot?

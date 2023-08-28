@@ -10,13 +10,37 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	
-	<groupId>com.maziade</groupId>
+	<groupId>com.maziade.tools</groupId>
 	<artifactId>cmdtoollib</artifactId>
 	<packaging>jar</packaging>
 
 	<version>0.0.1-SNAPSHOT</version>
 
 	<name>Command-Line Tool Library</name>
+	<description>Library to help kick-start spring-shell command-line tool helpers</description>
+	<url>https://github.com/themaze75/cmdtoollib</url>
+	
+	<scm>
+		<connection>scm:git:git@github.com:themaze75/cmdtoollib.git</connection>
+		<developerConnection>scm:git:ssh://github.com:themaze75/cmdtoollib.git</developerConnection>
+		<url>https://github.com/themaze75/cmdtoollib</url>
+	</scm>
+	
+	 <developers>
+		<developer>
+			<name>Eric Maziade</name>
+			<email>themaze75@gmail.com</email>
+			<organization>Maziade</organization>
+			<organizationUrl>https://github.com/themaze75</organizationUrl>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -117,5 +141,5 @@
 		</pluginManagement>
 
 	</build>
-	<description>Library to help kick-start spring-shell command-line tool helpers</description>
+
 </project>

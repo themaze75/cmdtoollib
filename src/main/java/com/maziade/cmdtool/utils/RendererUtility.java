@@ -15,22 +15,30 @@
  */
 package com.maziade.cmdtool.utils;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.Properties;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ansi.*;
+import org.springframework.boot.ansi.AnsiBackground;
+import org.springframework.boot.ansi.AnsiColor;
+import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.boot.ansi.AnsiOutput.Enabled;
 import org.springframework.stereotype.Component;
+
 import jakarta.annotation.PostConstruct;
 
+/**
+ * Core output render utility, handles some basic formatting and color functionality.
+ * 
+ * Use {@link RendererUtility#start()} to get an appender and build your output string.
+ */
 @Component
 public class RendererUtility
 {
-	public static final AnsiColor COLOR_TITLE = AnsiColor.BLUE;
-	public static final AnsiColor COLOR_INFO = AnsiColor.GREEN;
-	public static final AnsiColor COLOR_ERROR = AnsiColor.RED;
-	public static final AnsiColor COLOR_INFO_KEYWORD = AnsiColor.CYAN;
-	public static final AnsiColor COLOR_SYMBOL = AnsiColor.BRIGHT_CYAN;
-
 	@Value( "${spring.output.ansi.enabled:DETECT}") Enabled ansiEnabled;
 
 	@PostConstruct
@@ -39,11 +47,19 @@ public class RendererUtility
 		AnsiOutput.setEnabled(ansiEnabled);
 	}
 
+	/**
+	 * @return New Appender object
+	 */
 	public Appender start()
 	{
 		return new Appender();
 	}
 
+	/**
+	 * Render properties
+	 * @param out appender
+	 * @param properties properties to render
+	 */
 	public void renderOut(Appender out, Properties properties)
 	{
 		out.indent(() -> 
@@ -51,6 +67,13 @@ public class RendererUtility
 		);
 	}
 
+	/**
+	 * Render a set of entries as a grid.  Keys and values will be turned to strings using Object:toStirng
+	 * @param <K> Key class
+	 * @param <V> Value class
+	 * @param out appender
+	 * @param entries entries to render
+	 */
 	public <K, V> void renderOut(Appender out, Set<Map.Entry<K, V>> entries)
 	{
 		var set = entries.stream().sorted((a, b) -> a.getKey().toString().compareTo(b.getKey().toString())).toList();
@@ -61,6 +84,12 @@ public class RendererUtility
 			);
 	}
 
+	/**
+	 * Render a grid
+	 * @param out appender
+	 * @param withTitles true to use first row as titles
+	 * @param columns list of columns
+	 */
 	public final void renderOut(Appender out, boolean withTitles, List<List<String>> columns)
 	{
 		final int[] colWidths = columns.size() > 1 ? new int[columns.size() -1] : null;
@@ -72,11 +101,9 @@ public class RendererUtility
 		while (iters.get(0).hasNext())
 		{
 			if (firstLine && withTitles)
-				out.setColor(COLOR_TITLE);
+				out.setColor(ColorSetting.TITLE);
 			else
 				out.setColor(AnsiColor.DEFAULT);
-
-			out.startLine();
 
 			for (int i = 0; i < columns.size(); i++)
 			{
@@ -86,23 +113,21 @@ public class RendererUtility
 				if (i < columns.size() - 1 && colWidths != null)
 				{
 					out.pad(colWidths[i] - val.length() + 1);
-					out.append(COLOR_SYMBOL, " | ");
+					out.append(ColorSetting.SYMBOL, " | ");
 				}
 			}
 			out.endLine();
 
 			if (firstLine && withTitles)
 			{
-				out.startLine();
-				out.setColor(COLOR_SYMBOL).pad(totalPad,'-').setColor(AnsiColor.DEFAULT);
+				out.setColor(ColorSetting.SYMBOL).pad(totalPad,'-').setColor(AnsiColor.DEFAULT);
 				out.endLine();
 			}
 
 			firstLine = false;
 		}
 	}
-	
-	//--------------------------------------------------------------------------------------------------------------------------------
+
 	private int calculateColumnWidths(int[] colWidths, List<List<String>> columns)
 	{
 		int totalPad = 0;
@@ -123,7 +148,10 @@ public class RendererUtility
 	}
 
 	/**
-	 * Render a grid of keys/values and aligns the key column
+	 * Render a grid of keys/values
+	 * @param out appender
+	 * @param keys list of keys
+	 * @param values list of strings
 	 */
 	public void renderOut(Appender out, List<String> keys, List<String> values)
 	{
@@ -134,8 +162,6 @@ public class RendererUtility
 		var valueIt = values.iterator();
 		for(String key : keys)
 		{
-			out.startLine();
-
 			out.appendKeyword(key);
 			out.pad(colSize.getAsInt() - key.length() + 1);
 			out.append(": ");
@@ -146,12 +172,18 @@ public class RendererUtility
 	}
 
 	//--------------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * Builds the output string.  Built with chaining in mind.
+	 * 
+	 * Use {@link Appender#toString()} to acquire the resulting string.
+	 */
 	public class Appender
 	{
 		private StringBuilder out = new StringBuilder();
 		private int indentation = 0;
 		private AnsiColor lastColor = AnsiColor.DEFAULT;
 		private AnsiBackground lastBackground = AnsiBackground.DEFAULT;
+		private boolean lineStarted = false;
 
 		@Override
 		public String toString()
@@ -166,13 +198,33 @@ public class RendererUtility
 			return out.toString();
 		}
 
+		/**
+		 * Change the color
+		 * @param color new color
+		 * @return this for chainining
+		 */
 		public Appender setColor(AnsiColor color)
 		{
 			lastColor = color;
 			out.append(AnsiOutput.encode(color));
 			return this;
 		}
+		
+		/**
+		 * Change the color
+		 * @param color new color
+		 * @return this for chainining
+		 */
+		public Appender setColor(ColorSetting color)
+		{
+			return setColor(color.color);
+		}
 
+		/**
+		 * Sets the background color
+		 * @param color new color
+		 * @return this for chainining
+		 */
 		public Appender setBackground(AnsiBackground color)
 		{
 			lastBackground = color;
@@ -180,6 +232,11 @@ public class RendererUtility
 			return this;
 		}
 
+		/**
+		 * Indents (2 spaces) the content that will be appended by the passed lambda
+		 * @param doIt function that will output more data.
+		 * @return this for chainining
+		 */
 		public Appender indent(Runnable doIt)
 		{
 			indentation += 2;
@@ -188,34 +245,54 @@ public class RendererUtility
 			return this;
 		}
 
+		/**
+		 * Write a line and ends it
+		 * @param line line to output
+		 * @return this for chainining
+		 */
 		public Appender writeln(String line)
 		{
-			startLine();
-			out.append(line);
+			append(line);
 			endLine();
 			return this;
 		}
 
-		public Appender writeTitle(String line)
+		/**
+		 * Writes a title using title formatting
+		 * @param title title 
+		 * @return this for chainining
+		 */
+		public Appender writeTitle(String title)
 		{
-			append(COLOR_TITLE, line);
+			append(ColorSetting.TITLE, title);
 			endLine();
 			return this;
 		}
 
+		/**
+		 * Writes a keyword using keyword formatting
+		 * @param in keyword
+		 * @return this for chainining
+		 */
 		public Appender appendKeyword(String in)
 		{
-			append(COLOR_INFO_KEYWORD, in);
+			append(ColorSetting.KEYWORD, in);
 			return this;
 		}
 
+		/**
+		 * Writes content in a given color and brings back the previous color
+		 * @param color new color
+		 * @param in content to append
+		 * @return this for chainining
+		 */
 		public Appender append(AnsiColor color, String in)
 		{
 			AnsiColor c = lastColor;
 			if (c != color)
 				setColor(color);
 
-			out.append(in);
+			append(in);
 
 			if (c != color)
 				setColor(c);
@@ -223,23 +300,61 @@ public class RendererUtility
 			return this;
 		}
 		
-		public Appender error(String in)
+		/**
+		 * Writes content in a given color and brings back the previous color
+		 * @param color new color
+		 * @param in content to append
+		 * @return this for chainining
+		 */
+		public Appender append(ColorSetting color, String in)
 		{
-			return append(COLOR_ERROR, in);
+			return append(color.color, in);
 		}
 
+		/**
+		 * Writes content using error styling
+		 * @param in content to append
+		 * @return this for chainining
+		 */
+		public Appender error(String in)
+		{
+			return append(ColorSetting.ERROR, in);
+		}
+
+		/**
+		 * Writes content to the output 
+		 * @param in content to append
+		 * @return this for chainining
+		 */
 		public Appender append(String in)
 		{
+			if (!lineStarted)
+			{
+				lineStarted = true;
+				pad(indentation);
+			}
+
 			out.append(in);
 			
 			return this;
 		}
 
+		/**
+		 * Writes a certain number of spaces for padding
+		 * @param length number of spaces
+		 * @return this for chainining
+		 */
 		public Appender pad(int length)
 		{
 			return pad(length, ' ');
 		}
 		
+		/**
+		 * Writes a certain number of a given character for padding
+		 * @param length number of characters
+		 * @param c character
+		 * @return this for chainining
+		 */
 		public Appender pad(int length, char c)
 		{
 			for (int i = 0; i <= length; i++)
@@ -248,19 +363,37 @@ public class RendererUtility
 			return this;
 		}
 
-		public Appender startLine()
-		{
-			for (int i = 0; i < indentation; i++)
-				out.append(' ');
-			
-			return this;
-		}
-
+		/**
+		 * Ends the current line
+		 * @return this for chainining
+		 */
 		public Appender endLine()
 		{
 			out.append("\n");
+			lineStarted = false;
 			return this;
 		}
+	}
+	
+	public enum ColorSetting {
+
+		TITLE(AnsiColor.BLUE), 
+		INFO(AnsiColor.GREEN), 
+		ERROR(AnsiColor.RED), 
+		WARN(AnsiColor.YELLOW),
+		KEYWORD(AnsiColor.CYAN), 
+		SYMBOL(AnsiColor.BRIGHT_CYAN);
 		
+		private AnsiColor color;
+		
+		private ColorSetting(AnsiColor color)
+		{
+			setColor(color);
+		}
+		
+		protected void setColor(AnsiColor color)
+		{
+			this.color = color;
+		}
 	}
 }

@@ -44,13 +44,24 @@ public class SystemUtility
 		return exts;
 	}).get().toArray(new String[] {});
 
-	//--------------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * Run a command on the operating system
+	 * @param cmd command
+	 * @param cmdArgs arguments
+	 * @param processor processor that will parse the output
+	 */
 	public void runCommand(Path cmd, String cmdArgs, LineProcessor processor)
 	{
-		runCommand(cmd, cmdArgs, processor, false);
+		runCommand(buildCommand(cmd, cmdArgs), processor, false);
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * Finds the absolute path to the command (works out extensions for Windows)
+	 * @param home home folder
+	 * @param binPath path to binary under the home folder
+	 * @param cmdBaseName name of the command (without extension for Windows)
+	 * @return absolute path, if the command was found
+	 */
 	public Optional<Path> firstPathOf(File home, String binPath, String cmdBaseName)
 	{
 		final String homePath = home.getAbsolutePath();
@@ -64,14 +75,44 @@ public class SystemUtility
 
 		return Optional.empty();
 	}
-
-	//--------------------------------------------------------------------------------------------------------------------------------
+	
+	/**
+	 * Run a command on the operating system
+	 * @param cmd command
+	 * @param cmdArgs arguments
+	 * @param processor processor that will parse the output
+	 * @param readFromErrorOut if true, monitor error stream.
+	 * @throws RuntimeException with error stream output
+	 */
 	public void runCommand(Path cmd, String cmdArgs, LineProcessor processor, boolean readFromErrorOut)
+	{
+		runCommand(buildCommand(cmd, cmdArgs), processor, readFromErrorOut);
+	}
+
+	/**
+	 * Run a command on the operating system
+	 * @param command command
+	 * @param processor processor that will parse the output
+	 * @param readFromErrorOut if true, monitor error stream.
+	 */
+	public void runCommand(String command, LineProcessor processor)
+	{
+		runCommand(command, processor, false);
+	}
+	
+	/**
+	 * Run a command on the operating system
+	 * @param command command
+	 * @param processor processor that will parse the output
+	 * @param readFromErrorOut if true, monitor error stream.
+	 * @throws RunCommandException if the commands ends with a non-zero error code or if there is captured output on the error stream
+	 */
+	public void runCommand(String command, LineProcessor processor, boolean readFromErrorOut)
 	{
 		try
 		{
 			final Runtime rt = Runtime.getRuntime();
-			final Process proc = rt.exec(cmd.toString() + " " + cmdArgs);
+			final Process proc = rt.exec(command);
 		
 			try(BufferedReader stdInput = new BufferedReader(new InputStreamReader(getResultStream(proc, readFromErrorOut)));
 					InputStream errOut = getErrorStream(proc, readFromErrorOut))
@@ -86,24 +127,26 @@ public class SystemUtility
 
 				final String err = IOUtils.toString(errOut, StandardCharsets.UTF_8);
 
-				// TODO handle error?
 				if (StringUtils.isNotEmpty(err))
-					throw new RuntimeException(err);
+					throw new RunCommandException(err).exitValue(proc.exitValue());
 			}
-			
+
 			if (proc.exitValue() != 0)
 			{
-				// TODO error??
+				throw new RunCommandException("Failed").exitValue(proc.exitValue());
 			}
 		}
 		catch(IOException e)
 		{
-			// TODO handle error?
 			throw new RuntimeException(e);
 		}
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
+	private String buildCommand(final Path cmd, String cmdArgs)
+	{
+		return cmd.toString() + " " + cmdArgs;
+	}
+
 	InputStream getResultStream(Process proc, boolean readFromErrorOutput)
 	{
 		if (readFromErrorOutput)
@@ -112,7 +155,6 @@ public class SystemUtility
 		return proc.getInputStream();
 	}
 	
-	//--------------------------------------------------------------------------------------------------------------------------------
 	InputStream getErrorStream(Process proc, boolean readFromErrorOutput)
 	{
 		// If we're reading from output, there is no real error stream, we'll return a fake one.
@@ -131,9 +173,44 @@ public class SystemUtility
 
 	//--------------------------------------------------------------------------------------------------------------------------------
 	//--------------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * Processes output lines when running commands
+	 */
 	@FunctionalInterface
 	public interface LineProcessor
 	{
 		public void process(String line, int lineIdx);
-	} 
+	}
+	
+	@SuppressWarnings("serial")
+	public class RunCommandException extends RuntimeException
+	{
+		private OptionalInt exitValue = OptionalInt.empty();
+
+		public RunCommandException(RuntimeException cause)
+		{
+			super(cause);
+		}
+
+		public RunCommandException(String message, RuntimeException cause)
+		{
+			super(message, cause);
+		}
+
+		public RunCommandException(String message)
+		{
+			super(message);
+		}
+		
+		public RunCommandException exitValue(int value)
+		{
+			exitValue = OptionalInt.of(value);
+			return this;
+		}
+
+		public OptionalInt exitValue()
+		{
+			return exitValue;
+		}
+	}
 }

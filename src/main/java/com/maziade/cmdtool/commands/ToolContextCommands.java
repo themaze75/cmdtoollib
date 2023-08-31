@@ -36,10 +36,10 @@ import org.springframework.shell.standard.ShellOption;
 
 import com.maziade.cmdtool.utils.RendererUtility;
 import com.maziade.cmdtool.utils.RendererUtility.Appender;
+import com.maziade.cmdtool.utils.RendererUtility.ColorSetting;
 
 import jakarta.annotation.PostConstruct;
 
-// --------------------------------------------------------------------------------------------------------------------------------
 @ShellComponent
 @ShellCommandGroup("Tool Context")
 public class ToolContextCommands implements CommandLineRunner
@@ -52,7 +52,6 @@ public class ToolContextCommands implements CommandLineRunner
 	Path propFile = Paths.get("tool.status");
 	Properties status = new Properties();
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	@PostConstruct
 	public void init()
 	{
@@ -78,7 +77,6 @@ public class ToolContextCommands implements CommandLineRunner
 		 
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	/**
 	 * Get the current path set for the tool
 	 * @return current path
@@ -88,7 +86,6 @@ public class ToolContextCommands implements CommandLineRunner
 		return currentPath;
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	/**
 	 * Get a resolved path from a path received in argument, taking into consideration the current path
 	 * @param path path
@@ -103,7 +100,6 @@ public class ToolContextCommands implements CommandLineRunner
 		return Path.of(currentPath.toString(), path);
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	@ShellMethod(key = "pwd", value = "Show current working path for test tool")
 	public String pwd()
 	{
@@ -114,11 +110,10 @@ public class ToolContextCommands implements CommandLineRunner
 		return out.toString();
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	void appendCurrentPath(Appender out)
 	{
 		out.append("Current path: ");
-		out.append(RendererUtility.COLOR_SYMBOL, currentPath.toString());
+		out.append(ColorSetting.SYMBOL, currentPath.toString());
 	}
 	
 	void saveCurrentStatus()
@@ -133,7 +128,6 @@ public class ToolContextCommands implements CommandLineRunner
 		}
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	@ShellMethod(key = "cd", value = "Change current working path")
 	public String cd(String path)
 	{
@@ -156,7 +150,6 @@ public class ToolContextCommands implements CommandLineRunner
 		return out.toString();
 	}
 	
-	//--------------------------------------------------------------------------------------------------------------------------------
 	@ShellMethod(key = "ls", value = "List files in current director")
 	public String ls(@ShellOption(defaultValue = "")String arg)
 	{
@@ -169,8 +162,6 @@ public class ToolContextCommands implements CommandLineRunner
 
 			for (var file : currentPath.toFile().listFiles())
 			{
-				out.startLine();
-
 				if (file.isDirectory())
 					out.setColor(AnsiColor.BRIGHT_BLUE);
 				else
@@ -184,7 +175,6 @@ public class ToolContextCommands implements CommandLineRunner
 		return out.toString();
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	@Override
 	public void run(String... args) throws Exception
 	{

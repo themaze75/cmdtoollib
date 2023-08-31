@@ -15,10 +15,8 @@
  */
 package com.maziade.cmdtool.utils.parsers;
 
-///--------------------------------------------------------------------------------------------------------------------------------
 public class MavenVersionParser extends VersionParser
 {
-	//--------------------------------------------------------------------------------------------------------------------------------
 	@Override
 	public void process(String line, int lineIdx)
 	{

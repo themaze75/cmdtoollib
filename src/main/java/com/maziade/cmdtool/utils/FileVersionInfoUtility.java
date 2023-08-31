@@ -25,13 +25,14 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 import com.sun.jna.win32.W32APIOptions;
 
-//--------------------------------------------------------------------------------------------------------------------------------
+/**
+ * When invoked, will use JNI to bind to Windows to get file version information for executable and DLL files.
+ */
 @Component
 public class FileVersionInfoUtility
 {
 	private Version instance;
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	/**
 	 * We want to bind JNI only if we ask for it (non-windows environments will not ask)
 	 * @return
@@ -44,7 +45,10 @@ public class FileVersionInfoUtility
 		return instance;
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * @param fileName File name for which to get version (exe or dll)
+	 * @return version number
+	 */
 	public Optional<String> getVersion(String fileName)
 	{
 		if (!Files.exists(Path.of(fileName)))
@@ -60,14 +64,11 @@ public class FileVersionInfoUtility
 			final PointerByReference lplpBuffer = new PointerByReference();
 			final IntByReference dataSize = new IntByReference();
 			boolean res = v.GetFileVersionInfoW(fileName, 0, verSize, lpData);
-			
-			// TODO result??
+
 			if (!res)
 				return Optional.empty();
 	
 			res = v.VerQueryValueW(lpData, "\\", lplpBuffer, dataSize);
-
-			// TODO result??
 
 			if (!res)
 				return Optional.empty();
@@ -148,7 +149,6 @@ public class FileVersionInfoUtility
 		public int	dwFileDateMS;		// NOSONAR JNI Bind
 		public int	dwFileDateLS;		// NOSONAR JNI Bind
 
-		//--------------------------------------------------------------------------------------------------------------------------------
 		public VS_FIXEDFILEINFO(com.sun.jna.Pointer p)
 		{
 			super(p);

@@ -23,11 +23,15 @@ import javax.xml.stream.*;
 import javax.xml.stream.events.*;
 import org.springframework.stereotype.Component;
 
-//--------------------------------------------------------------------------------------------------------------------------------
+/**
+ * Simple quick and dirty wrapper around a streaming xml parser meant to build troubleshooting tools.
+ * 
+ * Quick and dirty means we'll throw IllegalStateException when unexpected error are encountered, 
+ * so we can focus on building the tool and let the operator handle raw exceptions.
+ */
 @Component
 public class XmlSimpleUtils
 {
-	//--------------------------------------------------------------------------------------------------------------------------------
 	/**
 	 * @return Pre-configured XML Input factory.  NB: Not thread-safe.
 	 */
@@ -44,18 +48,22 @@ public class XmlSimpleUtils
 		return xmlInputFactory;
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	/**
-	 * If the trail matches the given path of (tag1/tag2/tag3)
+	 * If the node trail matches the given path of (tag1/tag2/tag3)
+	 * @param trail node trail
+	 * @param path given path
+	 * @return true if we have a match.
 	 */
 	public boolean isPath(List<String> trail, String path)
 	{
 		return Objects.equals(path,  String.join("/", trail));
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	/**
-	 * If the tail end of the trail matches the tag name
+	 * If the  tail end of the node trail matches the tag name
+	 * @param trail trail
+	 * @param tagName given tag
+	 * @return true if the last node of the trail matches the gievn tag name
 	 */
 	public boolean isTag(List<String> trail, String tagName)
 	{
@@ -66,7 +74,12 @@ public class XmlSimpleUtils
 	}
 
 	
-	//--------------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * Get the attribute values from a start element
+	 * @param startElement element to explore for attributre
+	 * @param attribute attribute to look for
+	 * @return optional attribute value
+	 */
 	public Optional<String> getAttribute(StartElement startElement, String attribute)
 	{
 		var iter = startElement.getAttributes();
@@ -80,7 +93,13 @@ public class XmlSimpleUtils
 		return Optional.empty();
 	}
 	
-	//--------------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * Start processing XML from a string
+	 * @param xml XML string
+	 * @param processor instance of XmlProcessor to interpret the XML
+	 * 
+	 * @throws IllegalStateException when XML issues happen
+	 */
 	public void processXml(String xml, XmlProcessor processor)
 	{
 		XMLInputFactory xmlInputFactory = newXmlInputFactory();
@@ -98,7 +117,13 @@ public class XmlSimpleUtils
 		}
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * Start processing XML from a file
+	 * @param xml XML string
+	 * @param processor instance of XmlProcessor to interpret the XML
+	 * 
+	 * @throws IllegalStateException when XML issues happen
+	 */
 	public void processXmlFile(File xmlFile, XmlProcessor processor)
 	{
 		XMLInputFactory xmlInputFactory = newXmlInputFactory();
@@ -122,8 +147,13 @@ public class XmlSimpleUtils
 		}
 	}
 
-
-	//--------------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * Start processing XML from a file name
+	 * @param xml XML string
+	 * @param processor instance of XmlProcessor to interpret the XML
+	 * 
+	 * @throws IllegalStateException when XML issues happen
+	 */
 	public void processXmlFile(String xmlFile, XmlProcessor processor)
 	{
 		XMLInputFactory xmlInputFactory = newXmlInputFactory();
@@ -146,8 +176,7 @@ public class XmlSimpleUtils
 			throw new IllegalStateException("Invalid XML file. " + xmlFile, e);
 		}
 	}
-		
-	//--------------------------------------------------------------------------------------------------------------------------------
+
 	private void readAsXml(XMLEventReader reader, XmlProcessor processor)
 	{
 		final List<String> trail = new ArrayList<>();
@@ -197,22 +226,38 @@ public class XmlSimpleUtils
 	}
 
 	//---------------------------------------------------------------------------------------------------------------------------------
-	//---------------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * Simple XML processor.  Interface has default methods so you can implement only the ones you need.
+	 */
 	public interface XmlProcessor
 	{
-		//--------------------------------------------------------------------------------------------------------------------------------
+		/**
+		 * An XML element was just opened (now is the time to look at attributes)
+		 * @param trail node trail leading to and including this node. 
+		 * @param element element that has been opened
+		 */
 		public default void processElementStart(List<String> trail, StartElement element)
 		{
 			
 		}
 		
-		//--------------------------------------------------------------------------------------------------------------------------------
+		/**
+		 * An XML element was just closed (now might be a good time to process what was inside the start node) 
+		 * @param trail trail node trail leading to and including this node. 
+		 * @param element element that has been closed
+		 */
 		public default void processElementEnd(List<String> trail, EndElement element)
 		{
 			
 		}
 		
-		//--------------------------------------------------------------------------------------------------------------------------------
+		/**
+		 * We encountered characters inside of a node.
+		 * Note that XML comments and CData might make characters to come out in multiple chunks. 
+		 * @param trail trail node trail leading to the characters
+		 * 
+		 * @param string the characters, trimmed of whitespace
+		 */
 		public default void processCharacters(List<String> trail, String string)
 		{
 			

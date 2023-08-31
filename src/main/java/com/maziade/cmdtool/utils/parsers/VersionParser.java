@@ -21,13 +21,11 @@ import java.util.Map;
 import com.maziade.cmdtool.data.VersionInfo;
 import com.maziade.cmdtool.utils.SystemUtility.LineProcessor;
 
-///--------------------------------------------------------------------------------------------------------------------------------
 abstract class VersionParser implements LineProcessor
 {
 	String version;
 	Map<String, String> context = new HashMap<>();
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	protected void splitThis(String line)
 	{
 		int mark = 0;
@@ -65,19 +63,16 @@ abstract class VersionParser implements LineProcessor
 		}
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	public VersionInfo toVersionInfo()
 	{
 		return new VersionInfo(version, context);
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	public String getVersion()
 	{
 		return version;
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------
 	public Map<String, String> getContext()
 	{
 		return context;

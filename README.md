@@ -44,10 +44,7 @@ You'll need to create your main app class.
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<maven.compiler.target>17</maven.compiler.target>
-		<maven.compiler.source>17</maven.compiler.source>
-		<java.version.source>17</java.version.source>
-		<java.version.target>17</java.version.target>
+		<maven.compiler.release>17</maven.compiler.release>
 
 		<org.junit.jupiter.version>5.9.2</org.junit.jupiter.version>
 
@@ -120,7 +117,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan({"com.maziade.cmdtool.utils","com.maziade.cmdtool.commands"})
+@ComponentScan({"your.project.package.here", "com.maziade.cmdtool.utils", "com.maziade.cmdtool.commands"})
 public class YourProject
 {
 	//--------------------------------------------------------------------------------------------------------------------------------

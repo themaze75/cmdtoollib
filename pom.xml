@@ -14,7 +14,7 @@
 	<artifactId>cmdtoollib</artifactId>
 	<packaging>jar</packaging>
 
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 
 	<name>Command-Line Tool Library</name>
 	<description>Library to help kick-start spring-shell command-line tool helpers</description>
@@ -24,6 +24,7 @@
 		<connection>scm:git:git@github.com:themaze75/cmdtoollib.git</connection>
 		<developerConnection>scm:git:ssh://github.com:themaze75/cmdtoollib.git</developerConnection>
 		<url>https://github.com/themaze75/cmdtoollib</url>
+		<tag>cmdtoollib-0.0.1</tag>
 	</scm>
 	
 	<developers>

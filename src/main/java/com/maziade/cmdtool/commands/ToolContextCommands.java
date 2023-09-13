@@ -40,6 +40,9 @@ import com.maziade.cmdtool.utils.RendererUtility.ColorSetting;
 
 import jakarta.annotation.PostConstruct;
 
+/**
+ * Commands that affect the tools' global context, such as its persistence state.
+ */
 @ShellComponent
 @ShellCommandGroup("Tool Context")
 public class ToolContextCommands implements CommandLineRunner
@@ -52,6 +55,9 @@ public class ToolContextCommands implements CommandLineRunner
 	Path propFile = Paths.get("tool.status");
 	Properties status = new Properties();
 
+	/**
+	 * Initialize tool - loads state from properties file
+	 */
 	@PostConstruct
 	public void init()
 	{
@@ -100,6 +106,10 @@ public class ToolContextCommands implements CommandLineRunner
 		return Path.of(currentPath.toString(), path);
 	}
 
+	/**
+	 * Show current working path for test tool
+	 * @return current working path for test tool
+	 */
 	@ShellMethod(key = "pwd", value = "Show current working path for test tool")
 	public String pwd()
 	{
@@ -128,6 +138,11 @@ public class ToolContextCommands implements CommandLineRunner
 		}
 	}
 
+	/**
+	 * Change current working path
+	 * @param path new working path
+	 * @return current working path
+	 */
 	@ShellMethod(key = "cd", value = "Change current working path")
 	public String cd(String path)
 	{
@@ -150,7 +165,12 @@ public class ToolContextCommands implements CommandLineRunner
 		return out.toString();
 	}
 	
-	@ShellMethod(key = "ls", value = "List files in current director")
+	/**
+	 * List files in current directory
+	 * @param arg ???
+	 * @return files in current directory
+	 */
+	@ShellMethod(key = "ls", value = "List files in current directory")
 	public String ls(@ShellOption(defaultValue = "")String arg)
 	{
 		Appender out = rendererUtility.start();

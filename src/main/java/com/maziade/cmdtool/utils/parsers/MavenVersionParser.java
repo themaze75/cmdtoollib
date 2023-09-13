@@ -15,6 +15,9 @@
  */
 package com.maziade.cmdtool.utils.parsers;
 
+/**
+ * Parses Maven version string
+ */
 public class MavenVersionParser extends VersionParser
 {
 	@Override

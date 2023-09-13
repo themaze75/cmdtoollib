@@ -15,6 +15,7 @@
  */
 package com.maziade.cmdtool.utils.parsers;
 
+
 /*
 openjdk version "1.8.0_345"
 OpenJDK Runtime Environment (Temurin)(build 1.8.0_345-b01)
@@ -27,6 +28,10 @@ OpenJDK 64-Bit Server VM AdoptOpenJDK (build 11.0.10+9, mixed mode)
 openjdk 17.0.7 2023-04-18
 OpenJDK Runtime Environment Temurin-17.0.7+7 (build 17.0.7+7)
 OpenJDK 64-Bit Server VM Temurin-17.0.7+7 (build 17.0.7+7, mixed mode, sharing)
+ */
+
+/**
+ * Parses Java Version string 
  */
 public class JavaVersionParser extends VersionParser
 {

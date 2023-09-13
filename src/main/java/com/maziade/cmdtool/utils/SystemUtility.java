@@ -15,17 +15,28 @@
  */
 package com.maziade.cmdtool.utils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Supplier;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
 
+/**
+ * Helps to run system commands, trying to be a system-agnostic as we can.
+ */
 @Component
 public class SystemUtility
 {
@@ -93,7 +104,6 @@ public class SystemUtility
 	 * Run a command on the operating system
 	 * @param command command
 	 * @param processor processor that will parse the output
-	 * @param readFromErrorOut if true, monitor error stream.
 	 */
 	public void runCommand(String command, LineProcessor processor)
 	{
@@ -179,35 +189,70 @@ public class SystemUtility
 	@FunctionalInterface
 	public interface LineProcessor
 	{
+		/**
+		 * @param line line to process
+		 * @param lineIdx line index
+		 */
 		public void process(String line, int lineIdx);
 	}
 	
+	/**
+	 * Exception thrown when trying to run a command
+	 */
 	@SuppressWarnings("serial")
 	public class RunCommandException extends RuntimeException
 	{
+		/**
+		 * Exit value
+		 */
 		private OptionalInt exitValue = OptionalInt.empty();
 
+		/**
+		 * @param  cause the cause (which is saved for later retrieval by the
+		 *         {@link #getCause()} method).  (A {@code null} value is
+		 *         permitted, and indicates that the cause is nonexistent or
+		 *         unknown.)
+		 */
 		public RunCommandException(RuntimeException cause)
 		{
 			super(cause);
 		}
 
+		/**
+		 * @param  message the detail message (which is saved for later retrieval
+		 *         by the {@link #getMessage()} method).
+		 * @param  cause the cause (which is saved for later retrieval by the
+		 *         {@link #getCause()} method).  (A {@code null} value is
+		 *         permitted, and indicates that the cause is nonexistent or
+		 *         unknown.)
+		 */		
 		public RunCommandException(String message, RuntimeException cause)
 		{
 			super(message, cause);
 		}
 
+		/**
+		 * @param   message   the detail message. The detail message is saved for
+		 *          later retrieval by the {@link #getMessage()} method.
+		 */
 		public RunCommandException(String message)
 		{
 			super(message);
 		}
 		
+		/**
+		 * @param value exit value returned by the command execution
+		 * @return exception for chaining
+		 */
 		public RunCommandException exitValue(int value)
 		{
 			exitValue = OptionalInt.of(value);
 			return this;
 		}
 
+		/**
+		 * @return exit value, if we captured one
+		 */
 		public OptionalInt exitValue()
 		{
 			return exitValue;

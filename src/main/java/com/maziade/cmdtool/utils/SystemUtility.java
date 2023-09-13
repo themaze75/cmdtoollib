@@ -133,7 +133,7 @@ public class SystemUtility
 
 			if (proc.exitValue() != 0)
 			{
-				throw new RunCommandException("Failed").exitValue(proc.exitValue());
+				throw new RunCommandException("Failed running: " + command).exitValue(proc.exitValue());
 			}
 		}
 		catch(IOException e)

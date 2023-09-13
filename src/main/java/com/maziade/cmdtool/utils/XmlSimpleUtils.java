@@ -21,6 +21,9 @@ import java.util.*;
 import javax.xml.XMLConstants;
 import javax.xml.stream.*;
 import javax.xml.stream.events.*;
+
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -56,7 +59,28 @@ public class XmlSimpleUtils
 	 */
 	public boolean isPath(List<String> trail, String path)
 	{
-		return Objects.equals(path,  String.join("/", trail));
+		return Objects.equals(path, String.join("/", trail));
+	}
+	
+	/**
+	 * If the node trail ends with the given path of (tag1/tag2/tag3)
+	 * @param trail node trail
+	 * @param pathEnd given path end (full segments only)
+	 * @return true if we have a match.
+	 */
+	public boolean pathEndsWith(List<String> trail, String pathEnd)
+	{
+		String strStrail = String.join("/", trail);
+		boolean doesEnd = StringUtils.endsWith(strStrail, pathEnd);
+		if (!doesEnd)
+			return false;
+
+		int ofs = strStrail.length() - pathEnd.length();
+		if (ofs == 0)
+			return true;
+
+		// If its not the full path, the preceding character should be a path separator
+		return (strStrail.charAt(ofs - 1) == '/');
 	}
 
 	/**
@@ -82,6 +106,9 @@ public class XmlSimpleUtils
 	 */
 	public Optional<String> getAttribute(StartElement startElement, String attribute)
 	{
+		if (ObjectUtils.anyNull(startElement, attribute))
+			return Optional.empty();
+
 		var iter = startElement.getAttributes();
 		while (iter.hasNext())
 		{

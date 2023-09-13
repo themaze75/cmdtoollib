@@ -55,78 +55,7 @@ public class RendererUtility
 		return new Appender();
 	}
 
-	/**
-	 * Render properties
-	 * @param out appender
-	 * @param properties properties to render
-	 */
-	public void renderOut(Appender out, Properties properties)
-	{
-		out.indent(() -> 
-			renderOut(out, properties.entrySet())
-		);
-	}
 
-	/**
-	 * Render a set of entries as a grid.  Keys and values will be turned to strings using Object:toStirng
-	 * @param <K> Key class
-	 * @param <V> Value class
-	 * @param out appender
-	 * @param entries entries to render
-	 */
-	public <K, V> void renderOut(Appender out, Set<Map.Entry<K, V>> entries)
-	{
-		var set = entries.stream().sorted((a, b) -> a.getKey().toString().compareTo(b.getKey().toString())).toList();
-		renderOut(
-				out, 
-				set.stream().map(e -> e.getKey().toString()).toList(), 
-				set.stream().map(e -> e.getValue().toString()).toList()
-			);
-	}
-
-	/**
-	 * Render a grid
-	 * @param out appender
-	 * @param withTitles true to use first row as titles
-	 * @param columns list of columns
-	 */
-	public final void renderOut(Appender out, boolean withTitles, List<List<String>> columns)
-	{
-		final int[] colWidths = columns.size() > 1 ? new int[columns.size() -1] : null;
-		int totalPad = calculateColumnWidths(colWidths, columns);
-
-		final List<Iterator<String>> iters = columns.stream().map(l -> l.iterator()).toList();
-		boolean firstLine = true;
-		
-		while (iters.get(0).hasNext())
-		{
-			if (firstLine && withTitles)
-				out.setColor(ColorSetting.TITLE);
-			else
-				out.setColor(AnsiColor.DEFAULT);
-
-			for (int i = 0; i < columns.size(); i++)
-			{
-				String val = iters.get(i).next();
-				out.append(val);
-
-				if (i < columns.size() - 1 && colWidths != null)
-				{
-					out.pad(colWidths[i] - val.length() + 1);
-					out.append(ColorSetting.SYMBOL, " | ");
-				}
-			}
-			out.endLine();
-
-			if (firstLine && withTitles)
-			{
-				out.setColor(ColorSetting.SYMBOL).pad(totalPad,'-').setColor(AnsiColor.DEFAULT);
-				out.endLine();
-			}
-
-			firstLine = false;
-		}
-	}
 
 	private int calculateColumnWidths(int[] colWidths, List<List<String>> columns)
 	{
@@ -145,30 +74,6 @@ public class RendererUtility
 		}
 
 		return totalPad;
-	}
-
-	/**
-	 * Render a grid of keys/values
-	 * @param out appender
-	 * @param keys list of keys
-	 * @param values list of strings
-	 */
-	public void renderOut(Appender out, List<String> keys, List<String> values)
-	{
-		OptionalInt colSize = keys.stream().mapToInt(String::length).max();
-		if (colSize.isEmpty())
-			return;
-		
-		var valueIt = values.iterator();
-		for(String key : keys)
-		{
-			out.appendKeyword(key);
-			out.pad(colSize.getAsInt() - key.length() + 1);
-			out.append(": ");
-			out.append(valueIt.next());
-			
-			out.endLine();
-		}
 	}
 
 	//--------------------------------------------------------------------------------------------------------------------------------
@@ -371,6 +276,120 @@ public class RendererUtility
 		{
 			out.append("\n");
 			lineStarted = false;
+			return this;
+		}
+		
+		/**
+		 * Render properties
+		 * @param properties properties to render
+		 * @return this for chainining
+		 */
+		public Appender renderOut(Properties properties)
+		{
+			indent(() -> 
+				renderOut(properties.entrySet())
+			);
+			
+			return this;
+		}
+
+		/**
+		 * Render a set of entries as a grid.  Keys and values will be turned to strings using Object:toStirng
+		 * @param <K> Key class
+		 * @param <V> Value class
+		 * @param map entries to render
+		 * @return this for chainining
+		 */
+		public <K, V> Appender renderOut(Map<K, V> map)
+		{
+			return renderOut(map.entrySet());
+		}
+		
+		/**
+		 * Render a set of entries as a grid.  Keys and values will be turned to strings using Object:toStirng
+		 * @param <K> Key class
+		 * @param <V> Value class
+		 * @param entries entries to render
+		 * @return this for chainining
+		 */
+		public <K, V> Appender renderOut(Set<Map.Entry<K, V>> entries)
+		{
+			var set = entries.stream().sorted((a, b) -> a.getKey().toString().compareTo(b.getKey().toString())).toList();
+			return renderOut(
+					set.stream().map(e -> e.getKey().toString()).toList(), 
+					set.stream().map(e -> e.getValue().toString()).toList()
+				);
+		}
+
+		/**
+		 * Render a grid of keys/values
+		 * @param keys list of keys
+		 * @param values list of strings
+		 * @return this for chainining
+		 */
+		public Appender renderOut(List<String> keys, List<String> values)
+		{
+			OptionalInt colSize = keys.stream().mapToInt(String::length).max();
+			if (colSize.isEmpty())
+				return this;
+			
+			var valueIt = values.iterator();
+			for(String key : keys)
+			{
+				appendKeyword(key);
+				pad(colSize.getAsInt() - key.length() + 1);
+				out.append(": ");
+				out.append(valueIt.next());
+
+				endLine();
+			}
+			
+			return this;
+		}
+
+		/**
+		 * Render a grid
+		 * @param withTitles true to use first row as titles
+		 * @param columns list of columns
+		 * @return this for chainining 
+		 */
+		public final Appender renderOut( boolean withTitles, List<List<String>> columns)
+		{
+			final int[] colWidths = columns.size() > 1 ? new int[columns.size() -1] : null;
+			int totalPad = calculateColumnWidths(colWidths, columns);
+
+			final List<Iterator<String>> iters = columns.stream().map(l -> l.iterator()).toList();
+			boolean firstLine = true;
+			
+			while (iters.get(0).hasNext())
+			{
+				if (firstLine && withTitles)
+					setColor(ColorSetting.TITLE);
+				else
+					setColor(AnsiColor.DEFAULT);
+
+				for (int i = 0; i < columns.size(); i++)
+				{
+					String val = iters.get(i).next();
+					append(val);
+
+					if (i < columns.size() - 1 && colWidths != null)
+					{
+						pad(colWidths[i] - val.length() + 1);
+						append(ColorSetting.SYMBOL, " | ");
+					}
+				}
+				endLine();
+
+				if (firstLine && withTitles)
+				{
+					setColor(ColorSetting.SYMBOL).pad(totalPad,'-').setColor(AnsiColor.DEFAULT);
+					endLine();
+				}
+
+				firstLine = false;
+			}
+			
 			return this;
 		}
 	}

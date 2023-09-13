@@ -26,6 +26,9 @@ import com.maziade.cmdtool.utils.RendererUtility;
 import com.maziade.cmdtool.utils.RendererUtility.Appender;
 import com.maziade.cmdtool.utils.RendererUtility.ColorSetting;
 
+/**
+ * Web-based commands
+ */
 @ShellComponent
 @ShellCommandGroup("Generic Web Commands")
 public class WebCommands implements CommandLineRunner
@@ -33,7 +36,11 @@ public class WebCommands implements CommandLineRunner
 	@Autowired RendererUtility rendererUtility;
 	@Autowired PowershellUtility psUtility;
 
-
+	/**
+	 * Resolve host name
+	 * @param hostName host name to resolve
+	 * @return list of resolved hosts
+	 */
 	@ShellMethod(key = "host", value = "Resolve host name")
 	public String resolve(String hostName)
 	{
@@ -52,6 +59,11 @@ public class WebCommands implements CommandLineRunner
 		return out.toString();
 	}
 	
+	/**
+	 * Check if given IP is bound to the local machine
+	 * @param ip given IP
+	 * @return true if bound to the local machine
+	 */
 	@ShellMethod(key = "isLocalIp", value = "Check if given IP is bound to the local machine")
 	public String isLocalIP(String ip)
 	{

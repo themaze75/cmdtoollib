@@ -26,6 +26,10 @@ abstract class VersionParser implements LineProcessor
 	String version;
 	Map<String, String> context = new HashMap<>();
 
+	/**
+	 * Split the given line
+	 * @param line the given line
+	 */
 	protected void splitThis(String line)
 	{
 		int mark = 0;
@@ -63,16 +67,25 @@ abstract class VersionParser implements LineProcessor
 		}
 	}
 
+	/**
+	 * @return Version Info
+	 */
 	public VersionInfo toVersionInfo()
 	{
 		return new VersionInfo(version, context);
 	}
 
+	/**
+	 * @return version string
+	 */
 	public String getVersion()
 	{
 		return version;
 	}
 
+	/**
+	 * @return context information
+	 */
 	public Map<String, String> getContext()
 	{
 		return context;

@@ -41,6 +41,9 @@ public class RendererUtility
 {
 	@Value( "${spring.output.ansi.enabled:DETECT}") Enabled ansiEnabled;
 
+	/**
+	 * Initialization
+	 */
 	@PostConstruct
 	protected void init()
 	{
@@ -394,13 +397,39 @@ public class RendererUtility
 		}
 	}
 	
+	/**
+	 * Generalized color values
+	 */
 	public enum ColorSetting {
 
-		TITLE(AnsiColor.BLUE), 
-		INFO(AnsiColor.GREEN), 
-		ERROR(AnsiColor.RED), 
+		/**
+		 * Color for titles
+		 */
+		TITLE(AnsiColor.BLUE),
+		
+		/**
+		 * Color for information
+		 */
+		INFO(AnsiColor.GREEN),
+		
+		/**
+		 * Color for error
+		 */
+		ERROR(AnsiColor.RED),
+		
+		/**
+		 * Color for warnings
+		 */
 		WARN(AnsiColor.YELLOW),
-		KEYWORD(AnsiColor.CYAN), 
+		
+		/**
+		 * Color for keyword highlighting
+		 */
+		KEYWORD(AnsiColor.CYAN),
+		
+		/**
+		 * Color for symbols
+		 */
 		SYMBOL(AnsiColor.BRIGHT_CYAN);
 		
 		private AnsiColor color;
@@ -409,7 +438,10 @@ public class RendererUtility
 		{
 			setColor(color);
 		}
-		
+
+		/**
+		 * @param color new color
+		 */
 		protected void setColor(AnsiColor color)
 		{
 			this.color = color;

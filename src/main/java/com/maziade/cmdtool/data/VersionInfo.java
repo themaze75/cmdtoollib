@@ -19,7 +19,11 @@ import java.util.Map;
 import org.apache.commons.lang3.builder.MultilineRecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-//--------------------------------------------------------------------------------------------------------------------------------
+/**
+ * Version Info structure
+ * @param version version 
+ * @param meta meta data 
+ */
 public record VersionInfo(
 		String version,
 		Map<String, String> meta)

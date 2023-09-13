@@ -146,7 +146,7 @@ public class XmlSimpleUtils
 
 	/**
 	 * Start processing XML from a file
-	 * @param xml XML string
+	 * @param xmlFile XML file
 	 * @param processor instance of XmlProcessor to interpret the XML
 	 * 
 	 * @throws IllegalStateException when XML issues happen
@@ -176,7 +176,7 @@ public class XmlSimpleUtils
 
 	/**
 	 * Start processing XML from a file name
-	 * @param xml XML string
+	 * @param xmlFile XML file name
 	 * @param processor instance of XmlProcessor to interpret the XML
 	 * 
 	 * @throws IllegalStateException when XML issues happen

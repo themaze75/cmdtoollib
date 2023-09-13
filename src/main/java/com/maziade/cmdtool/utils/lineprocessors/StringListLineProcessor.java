@@ -15,10 +15,16 @@ public class StringListLineProcessor implements LineProcessor
 	final List<String> strings = new ArrayList<>();
 	final boolean keepEmptyLines;
 	
+	/**
+	 * Defaults to ignoring empty lines
+	 */
 	public StringListLineProcessor() {
 		keepEmptyLines = false;
 	}
 	
+	/**
+	 * @param keepEmptyLines true if we want to keep empty lines
+	 */
 	public StringListLineProcessor(boolean keepEmptyLines) {
 		this.keepEmptyLines = keepEmptyLines;
 	}

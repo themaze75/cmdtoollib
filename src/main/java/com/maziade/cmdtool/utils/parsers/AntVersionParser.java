@@ -15,6 +15,9 @@
  */
 package com.maziade.cmdtool.utils.parsers;
 
+/**
+ * Parses ANT version strings
+ */
 public class AntVersionParser extends VersionParser
 {
 	@Override

@@ -94,17 +94,39 @@ public class FileVersionInfoUtility
 	interface Version extends Library
 	{
 		/**
+		 * Get File Version Info buffer size
+		 * 
 		 * https://learn.microsoft.com/en-us/windows/win32/api/winver/nf-winver-getfileversioninfosizew
+		 *
+		 * @param lptstrFilename file name
+		 * @param dwDummy ignored
+		 * @return file size
 		 */
 		public int GetFileVersionInfoSizeW(String lptstrFilename, int dwDummy); // NOSONAR JNI Bind
 
 		/**
+		 * Get File Version Info.
+		 * 
 		 * https://learn.microsoft.com/en-us/windows/win32/api/winver/nf-winver-getfileversioninfow
+		 * 
+		 * @param lptstrFilename file name
+		 * @param dwHandle file handle
+		 * @param dwLen length of data buffer
+		 * @param lpData data buffer
+		 * @return success
 		 */
 		public boolean GetFileVersionInfoW(String lptstrFilename, int dwHandle, int dwLen, Pointer lpData); // NOSONAR JNI Bind
 
 		/**
+		 * Query for Version info
+		 * 
 		 * https://learn.microsoft.com/en-us/windows/win32/api/winver/nf-winver-verqueryvaluew
+		 * 
+		 * @param pBlock Version Info structure
+		 * @param lpSubBlock sub block
+		 * @param lplpBuffer pointer to buffer to receive data
+		 * @param puLen buffer size 
+		 * @return success
 		 */
 		public boolean VerQueryValueW(Pointer pBlock, String lpSubBlock, PointerByReference lplpBuffer, IntByReference puLen); // NOSONAR JNI Bind
 	}
@@ -119,7 +141,13 @@ public class FileVersionInfoUtility
 		"dwFileDateLS"})
 	public static class VS_FIXEDFILEINFO extends Structure
 	{
+		/**
+		 * Signature marker
+		 */
 		public int	dwSignature;		// NOSONAR JNI Bind
+		/**
+		 * Structure version
+		 */
 		public int	dwStrucVersion;		// NOSONAR JNI Bind
 		/**
 		 * The most significant 32 bits of the file's binary version number. 
@@ -141,14 +169,38 @@ public class FileVersionInfoUtility
 		 * This member is used with dwProductVersionMS to form a 64-bit value used for numeric comparisons.
 		 */
 		public int	dwProductVersionLS;	// NOSONAR JNI Bind
+		/**
+		 * 
+		 */
 		public int	dwFileFlagsMask;	// NOSONAR JNI Bind
+		/**
+		 * 
+		 */
 		public int	dwFileFlags;		// NOSONAR JNI Bind
+		/**
+		 * 
+		 */
 		public int	dwFileOS;			// NOSONAR JNI Bind
+		/**
+		 * 
+		 */
 		public int	dwFileType;			// NOSONAR JNI Bind
+		/**
+		 * 
+		 */
 		public int	dwFileSubtype;		// NOSONAR JNI Bind
+		/**
+		 * 
+		 */
 		public int	dwFileDateMS;		// NOSONAR JNI Bind
+		/**
+		 * 
+		 */
 		public int	dwFileDateLS;		// NOSONAR JNI Bind
 
+		/**
+		 * @param p data
+		 */
 		public VS_FIXEDFILEINFO(com.sun.jna.Pointer p)
 		{
 			super(p);
